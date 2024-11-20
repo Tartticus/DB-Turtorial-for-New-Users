@@ -6,6 +6,9 @@ import pandas as pd
 from datetime import datetime
 import os
 
+
+
+#import list for non real niggas 
 """
 from bad artists.py import Bad_Artists
 """
@@ -101,7 +104,7 @@ def insert_username(username, is_real_nigga):
     """
     conn.execute(insert_query, [date_created, username])
 
-def parse_and_insert_json(json_file,Bad_Artists):
+def parse_and_insert_json(json_file):
     # Load the JSON file
     with open(json_file,"r") as file:
         data = json.load(file)
@@ -113,9 +116,11 @@ def parse_and_insert_json(json_file,Bad_Artists):
     df= df.iloc[1:]
     df["Timestamp"] = df["Timestamp"].apply(format_timestamp)
     timestamp = datetime.now()
-    username_ass = df[0]["username"]
+    
     #Bad Rappers
-    bad_rapper(timestamp,username_ass)
+    bad_rapper(timestamp)
+    
+    Bad_Artists = conn.execute("Select artist_name from Bad_Rappers group by artist_name having count(*) >=5  ").df()  
     for username in df["username"].dropna().unique():
         timestamp = datetime.now()
         
@@ -138,18 +143,23 @@ def parse_and_insert_json(json_file,Bad_Artists):
 
 def format_timestamp(ts):
     try:
-        return datetime.strptime(ts, "%m/%d/%Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
+        return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ").strftime('%m/%d/%Y %H:%M:%S')
     except ValueError as e:
         raise ValueError(f"Invalid timestamp format: {ts}. Error: {e}")
 
 def upsert_username(timestamp, username, real_nigga=None):
     # Extract the date from the Timestamp
-    Timestamp = timestamp.split(" ")[0]  # Assume timestamp is in "YYYY-MM-DD HH:MM:SS" format
+   
 
     
-    ass = conn.execute("Select DISTINCT artist_name as Bad_Rapper from ass having count >5").df()
+    try:
+        Timestamp = datetime.strptime(timestamp, "%m/%d/%Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
+        Timestamp_Date = datetime.strptime(Timestamp, "%Y-%m-%d  %H:%M:%S").strftime("%Y-%m-%d")
+    except Exception as e:
+        print(e)
+        pass
     
-    
+ 
 
 
     # Check if the username already exists for the same date
@@ -157,7 +167,7 @@ def upsert_username(timestamp, username, real_nigga=None):
     SELECT id FROM usernames
     WHERE username = ? AND CAST(date_created AS DATE) = ?;
     """
-    existing_id = conn.execute(existing_query, [username, Timestamp]).fetchone()
+    existing_id = conn.execute(existing_query, [username, Timestamp_Date]).fetchone()
    
     #updates db if its a different song
     if existing_id:
@@ -169,7 +179,7 @@ def upsert_username(timestamp, username, real_nigga=None):
         "real_nigga?" = ?,
         WHERE id = ?;
         """
-        conn.execute(update_query, [timestamp, real_nigga, existing_id[0]])
+        conn.execute(update_query, [Timestamp, real_nigga, existing_id[0]])
         print(f"Updated: {username} for date {Timestamp}")
     else:
         # Insert a new row
@@ -177,7 +187,7 @@ def upsert_username(timestamp, username, real_nigga=None):
         INSERT INTO usernames (date_created, username, "real_nigga?")
         VALUES (?, ?, ?);
         """
-        conn.execute(insert_query, [timestamp, username, real_nigga])
+        conn.execute(insert_query, [Timestamp, username, real_nigga])
         print(f"Inserted: {username} for date {Timestamp}")    
 
 
@@ -185,7 +195,7 @@ def upsert_username(timestamp, username, real_nigga=None):
 def upsert_song(timestamp, username, song, artist):
     # Ensure timestamp is in the correct format
     try:
-        formatted_timestamp = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
+        formatted_timestamp = datetime.strptime(timestamp, "%m/%d/%Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
     except ValueError as e:
         raise ValueError(f"Invalid timestamp format: {timestamp}. Error: {e}")
     
@@ -225,28 +235,28 @@ def upsert_song(timestamp, username, song, artist):
         VALUES (?, ?, ?, ?);
         """
         conn.execute(insert_query, [timestamp, username, song, artist])
-        print(f"Inserted: {username}'s song '{song}' by {artist} for today ({today_date})")
+        print(f"Inserted: {username}'s song '{song}' by {artist} for today ({today_date})\n")
       
-def bad_rapper(timestamp,username):
-    artist_name = input("are there any rappers you hate?")
+def bad_rapper(timestamp):
+    
     
     insert_query = """
-    INSERT INTO ass (date_created, artist_name, username)
+    INSERT INTO Bad_Rappers (date_created, artist_name, username)
     VALUES (?, ?, ?, );
     """
     bad_rapper  = input("Are there any bad rappers you want to contribute? Y or N \n")
     if bad_rapper == "Y":
-            
+        username = input("What is your username?\n") 
         date = datetime.now()
-        ass = input("Enter Artist Name")
-        conn.execute(insert_query, [date,ass,username])
+        bad_art = input("Enter Artist Name:\n")
+        conn.execute(insert_query, [date,bad_art,username])
+        print(f"Thank you, {bad_art} was inseerted\n")
     
-    
-json_file = "src/music_data.json"
+
+json_file = "music_data.json"
 
 def main():
-   
+    
     parse_and_insert_json(json_file)
-
 
 
