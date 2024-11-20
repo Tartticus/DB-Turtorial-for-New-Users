@@ -17,9 +17,9 @@ open the downloadgit.ps1 file then press windows key and right click powershell 
 
 
 # Cloning and making reoi 
-1. run in powershell -  git clone https://github.com/JohnBummit/Twitter_Song_DB.git
+1. run in powershell -  git clone https://github.com/Tartticus/DB-Turtorial-for-New-Users.git
 
-2. run in powershell - ./Twitter_Song_DB/run_script_with_update.ps1
+2. run in powershell - ./DB-Turtorial-for-New-Users/run_script_with_update.ps1
 
 
 # This project is supposed to be stupid. dont be sccared to add, also tell me where to improve, im still new and dumb
