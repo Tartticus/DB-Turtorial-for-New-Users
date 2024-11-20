@@ -250,7 +250,7 @@ def bad_rapper(timestamp):
         date = datetime.now()
         bad_art = input("Enter Artist Name:\n")
         conn.execute(insert_query, [date,bad_art,username])
-        print(f"Thank you, {bad_art} was inseerted\n")
+        print(f"Thank you, {bad_art} was inserted\n")
     
 
 json_file = "music_data.json"
@@ -258,5 +258,4 @@ json_file = "music_data.json"
 def main():
     
     parse_and_insert_json(json_file)
-
 
