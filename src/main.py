@@ -224,7 +224,7 @@ def upsert_song(timestamp, username, song, artist):
             SET date_created = ?, song = ?, artist = ?, 
             WHERE id = ?;
             """
-            conn.execute(update_query, [timestamp, song, artist, existing_id])
+            conn.execute(update_query, [formatted_timestamp, song, artist, existing_id])
             print(f"Updated: {username}'s song to '{song}' by {artist} for today ({today_date})")
         else:
             print(f"No update needed: {username} already has the same song '{song}' by {artist} for today ({today_date})")
@@ -234,7 +234,7 @@ def upsert_song(timestamp, username, song, artist):
         INSERT INTO songs (date_created, username, song, artist)
         VALUES (?, ?, ?, ?);
         """
-        conn.execute(insert_query, [timestamp, username, song, artist])
+        conn.execute(insert_query, [formatted_timestamp, username, song, artist])
         print(f"Inserted: {username}'s song '{song}' by {artist} for today ({today_date})\n")
       
 def bad_rapper(timestamp):
